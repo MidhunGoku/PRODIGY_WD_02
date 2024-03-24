@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stopwatch</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  #display {
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+  #controls {
+    margin-bottom: 20px;
+  }
+  button {
+    font-size: 1em;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div id="display">00:00:00</div>
+<div id="controls">
+  <button onclick="start()">Start</button>
+  <button onclick="pause()">Pause</button>
+  <button onclick="reset()">Reset</button>
+  <button onclick="lap()">Lap</button>
+</div>
+<div id="laps"></div>
+
+<script>
+  let timerInterval;
+  let startTime;
+  let elapsedTime = 0;
+  let laps = [];
+
+  function displayTime(time) {
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
+    const milliseconds = Math.floor((time % 1000) / 10);
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+  }
+
+  function updateDisplay() {
+    document.getElementById('display').textContent = displayTime(elapsedTime);
+  }
+
+  function start() {
+    if (!timerInterval) {
+      startTime = Date.now() - elapsedTime;
+      timerInterval = setInterval(() => {
+        elapsedTime = Date.now() - startTime;
+        updateDisplay();
+      }, 10);
+    }
+  }
+
+  function pause() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function reset() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    elapsedTime = 0;
+    updateDisplay();
+    document.getElementById('laps').innerHTML = '';
+    laps = [];
+  }
+
+  function lap() {
+    if (timerInterval) {
+      laps.push(elapsedTime);
+      const lapTime = displayTime(elapsedTime);
+      const lapIndex = laps.length;
+      const lapElement = document.createElement('div');
+      lapElement.textContent = `Lap ${lapIndex}: ${lapTime}`;
+      document.getElementById('laps').appendChild(lapElement);
+    }
+  }
+</script>
+</body>
+</html>
